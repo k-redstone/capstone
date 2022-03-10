@@ -1,30 +1,32 @@
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
-
 const db_config = require("./sql.js");
 const conn = db_config.init()
 
 
-function saveDB(articleId, time, title) {
-  let param = [articleId, time, title]
-  let sql = `insert into article(id, time, title) values(?, ?, ?)`;
+function saveDB(articleId, time, content) {
+  let param = [articleId, time, content]
+  let sql = `insert into article(id, time, content) values(?, ?, ?)`;
   conn.query(sql,param, function(error, rows, fields) {
     if(error) console.log('query failed: ' + error)
   })
+  console.log("save db")
 }
-  
+
 
 // 게시판에서 가져온 id로 개별 게시물 조회
 const getArticleId = async(lists, $, page) => {
   for (let i = 0; i < lists.length; i++) {
     const articleId = $(lists[i]).attr('id');
     await page.goto(`https://api.everytime.kr/find/board/comment/list?id=${articleId}&limit_num=-1&articleInfo=true`)
-
+    // 게시물 컨텐츠 로드 및 저장
     const article = await page.content()
     const _ = cheerio.load(article, {xmlMode: true})
-    const title = _('#webkit-xml-viewer-source-xml > response > article').attr('title');
+    const content = `${_('#webkit-xml-viewer-source-xml > response > article').attr('title')} ${_('#webkit-xml-viewer-source-xml > response > article').attr('text')}`;
+    // const text = ;
     const time = _('#webkit-xml-viewer-source-xml > response > article').attr('created_at');
-    saveDB(articleId, time, title)
+    console.log(i + " article load")
+    saveDB(articleId, time, content)
     await page.waitForTimeout(1000)
   }
 }
@@ -39,6 +41,7 @@ const login = async(page) => {
   }, id, pw);
   // 로그인 버튼 클릭
   await page.click('.submit');
+  console.log("Successfully login")
 }
 
 
@@ -63,14 +66,15 @@ const login = async(page) => {
     await login(page)
 
     // api 요청
-    await page.goto("https://api.everytime.kr/find/board/article/list?id=370448&limit_num=2&start_num=1")
+    await page.goto("https://api.everytime.kr/find/board/article/list?id=370448&limit_num=3&start_num=1")
+    console.log("Go mian page after Login")
     await page.waitForTimeout(2000)
 
     // cheerio를 통해 xml 파일 처리
     const mainboard = await page.content()
     const $ = cheerio.load(mainboard, {xmlMode: true})
     const lists = $('#webkit-xml-viewer-source-xml > response > article');
-
+    console.log("get board xml")
     // 게시판에서 가져온 id로 개별 게시물 조회
     await getArticleId(lists, $, page)
 

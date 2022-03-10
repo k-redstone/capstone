@@ -1,11 +1,11 @@
 const mysql = require('mysql');
 
 const db_info = {
-  host: 'localhost',
+  host: '222.113.91.56',
   port: '3306',
-  user: 'root',
+  user: 'capstone',
   password: 'root',
-  database: 'capstone'
+  database: 'python'
 }
 
 module.exports = {
