@@ -66,7 +66,7 @@ const login = async(page) => {
     await login(page)
 
     // api 요청
-    await page.goto("https://api.everytime.kr/find/board/article/list?id=370448&limit_num=3&start_num=1")
+    await page.goto("https://api.everytime.kr/find/board/article/list?id=370448&limit_num=4&start_num=1")
     console.log("Go mian page after Login")
     await page.waitForTimeout(2000)
 
