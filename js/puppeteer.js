@@ -41,6 +41,7 @@ const login = async(page) => {
   }, id, pw);
   // 로그인 버튼 클릭
   await page.click('.submit');
+  await page.waitForTimeout(2000)
   console.log("Successfully login")
 }
 
@@ -66,7 +67,7 @@ const login = async(page) => {
     await login(page)
 
     // api 요청
-    await page.goto("https://api.everytime.kr/find/board/article/list?id=370448&limit_num=4&start_num=1")
+    await page.goto("https://api.everytime.kr/find/board/article/list?id=370448&limit_num=2&start_num=1")
     console.log("Go mian page after Login")
     await page.waitForTimeout(2000)
 
@@ -83,3 +84,10 @@ const login = async(page) => {
     console.log("Error:", error)
   }
 })();
+
+
+
+// 탑틱 모델링
+
+
+// 주제를 구체화

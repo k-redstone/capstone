@@ -1,5 +1,5 @@
 # pymysql 모듈 필요
-# pip install pymysql
+# pip install pymysql  or  pip3 install pymysql
 import pymysql
 
 # mysql 연결
@@ -11,6 +11,20 @@ conn = pymysql.connect(host='222.113.91.56', user='capstone', password='root', d
 cursor = conn.cursor()
 
 
+# sql 실행
+def execute(sql, set):
+  cursor.execute(sql)
+  if set == "true":
+    catchData()
+    print("sql: insert finish")
+  conn.commit()
+  conn.close()
+
+
+def catchData():
+  res = cursor.fetchall()
+  for data in res:
+    print(data)
 
 
 # insert 삽입문
@@ -19,6 +33,8 @@ def insert(table, id, time, content):
   sql = "insert into {}(id, time, content) values(%s, %s, %s)".format(table)
   val = (id, time, content)
   cursor.execute(sql,val)
+  conn.commit()
+  conn.close()
   print("sql: insert finish")
 
 
@@ -34,6 +50,6 @@ def insert(table, id, time, content):
 # for data in res:
 #   print(data)
 
-conn.commit()
-conn.close()
+# conn.commit()
+# conn.close()
 
