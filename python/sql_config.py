@@ -12,13 +12,13 @@ cursor = conn.cursor()
 
 
 # sql 실행
-def execute(sql, set):
+def execute(sql):
   cursor.execute(sql)
-  if set == "true":
-    catchData()
-    print("sql: insert finish")
-  conn.commit()
-  conn.close()
+  # if set == "true":
+  #   catchData()
+  #   print("sql: insert finish")
+  # conn.commit()
+  # conn.close()
 
 
 def catchData():

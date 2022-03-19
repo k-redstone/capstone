@@ -2,6 +2,8 @@ const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const db_config = require("./sql.js");
 const conn = db_config.init()
+const standartTime = "2022-03-01 00:00:00"
+let stop = false
 
 
 function saveDB(articleId, time, content) {
@@ -13,8 +15,9 @@ function saveDB(articleId, time, content) {
   console.log("save db")
 }
 
-async function loop_board(page, num) {
-  for (let i = 1, j=1; j <= num; i += 20, j++) {
+async function loop_board(page) {
+  let i = 1
+  while (stop == false) {
     await page.goto(`https://api.everytime.kr/find/board/article/list?id=370448&limit_num=20&start_num=${i}`)
     // cheerio를 통해 xml 파일 처리
     const mainboard = await page.content()
@@ -22,6 +25,7 @@ async function loop_board(page, num) {
     const lists = $('#webkit-xml-viewer-source-xml > response > article');
     console.log("get board xml")
     await getArticleId(lists, $, page)
+    i +=  20
   }
 
 }
@@ -30,7 +34,6 @@ async function loop_board(page, num) {
 // 게시판에서 가져온 id로 개별 게시물 조회
 const getArticleId = async(lists, $, page) => {
   for (let i = 0; i < lists.length; i++) {
-    const standartTime = "2022-03-13 00:00:00"
     const articleId = $(lists[i]).attr('id');
     await page.goto(`https://api.everytime.kr/find/board/comment/list?id=${articleId}&limit_num=-1&articleInfo=true`)
     // 게시물 컨텐츠 로드 및 저장
@@ -38,11 +41,15 @@ const getArticleId = async(lists, $, page) => {
     const _ = cheerio.load(article, {xmlMode: true})
     const res = `${_('#webkit-xml-viewer-source-xml > response > article').attr('title')} ${_('#webkit-xml-viewer-source-xml > response > article').attr('text')}`;
     const content = res.replace(/<br \/>/g, " ")
-    // const text = ;
     const time = _('#webkit-xml-viewer-source-xml > response > article').attr('created_at');
+    if (standartTime > time) {
+      stop = true
+      break;
+    }
+
     console.log(i + " article load")
     saveDB(articleId, time, content)
-    await page.waitForTimeout(200)
+    await page.waitForTimeout(400)
   }
 }
 // 로그인 
@@ -87,7 +94,10 @@ const login = async(page) => {
     await page.waitForTimeout(2000)
 
     // 게시판에서 가져온 id로 개별 게시물 조회
-    await loop_board(page, 2)
+    await loop_board(page)
+
+
+
     conn.end()
 
   } catch(error){
