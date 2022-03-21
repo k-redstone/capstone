@@ -1,4 +1,5 @@
 # from tkinter import VERTICAL
+from matplotlib import font_manager
 import sql_config
 from konlpy.tag import Okt
 from collections import Counter
@@ -7,17 +8,26 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import rc
 import pandas as pd
-rc('font', family='AppleGothic')
-plt.rcParams['axes.unicode_minus'] = False
+
+# 윈도우 한글 폰트 설정
+font_path = "C:/Windows/Fonts/나눔고딕.ttf"
+font = font_manager.FontProperties(fname=font_path).get_name()
+rc('font', family=font)
+
+# 맥 폰트 설정
+# rc('font', family='AppleGothic')
+# plt.rcParams['axes.unicode_minus'] = False
+
 okt = Okt()
-
-
-sql = "select content from article limit 0, 10000;"
+# 모든 게시물 불러오기
+sql = "select * from article whrere content limit 0, 10000"
+# 상위 5개단어가 포함된 게시물 불러오기
+# sql = "select content from article where content like '%사람%' or content like '%교수%' or content like '%줌%' or content like '%수업%' or content like '%학교%' limit 0, 10000;"
 
 
 sql_config.execute(sql)
 res = [item[0] for item in sql_config.cursor.fetchall()]
-print(res)
+# print(res)
 
 # from sklearn.feature_extraction.text import CountVectorizer
 # from sklearn.feature_extraction.text import TfidfVectorizer
@@ -61,39 +71,39 @@ counter = Counter(noun_list)
 
 text = nltk.Text(noun_list, name = 'NMSC')
 
-text.plot(20)
+# text.plot(20)
 
 
 
 
 # 감정분석
 
-# from konlpy.tag import Kkma
+from konlpy.tag import Kkma
 
-# engine = Kkma()
-# polarity_dic = pd.read_csv('corpus/kosac/polarity.csv')
-# polarity_dic.set_index('ngram', inplace=True)
+engine = Kkma()
+polarity_dic = pd.read_csv('corpus/kosac/polarity.csv')
+polarity_dic.set_index('ngram', inplace=True)
 
-# def polarity_score(text):
-#   pos_tags = engine.pos(text)
-#   # n-gram
-#   unigram = ['/'.join(p) for p in pos_tags]
-#   bigram = [';'.join(z) for z in zip(unigram, unigram[1:])]
-#   trigram = [';'.join(z) for z in zip(*[unigram[i:] for i in range(3)])]
+def polarity_score(text):
+  pos_tags = engine.pos(text)
+  # n-gram
+  unigram = ['/'.join(p) for p in pos_tags]
+  bigram = [';'.join(z) for z in zip(unigram, unigram[1:])]
+  trigram = [';'.join(z) for z in zip(*[unigram[i:] for i in range(3)])]
   
-#   p_score = 0
-#   # polarity score = (p-n) / (p+n)
-#   for ngram in [unigram, bigram, trigram]:
-#     cond = polarity_dic.index.isin(ngram)
-#     s = polarity_dic.loc[cond, :].sum()
-#     if s['POS'] + s['NEG'] > 0: # div 0 방지
-#       p_score += (s['POS'] - s['NEG']) / (s['POS'] + s['NEG'])
-#       # print(p_score)
-#   return p_score
+  p_score = 0
+  # polarity score = (p-n) / (p+n)
+  for ngram in [unigram, bigram, trigram]:
+    cond = polarity_dic.index.isin(ngram)
+    s = polarity_dic.loc[cond, :].sum()
+    if s['POS'] + s['NEG'] > 0: # div 0 방지
+      p_score += (s['POS'] - s['NEG']) / (s['POS'] + s['NEG'])
+      # print(p_score)
+  return p_score
 
 
-# show = []
-# for i in range (len(res) - 1):
-#   show.append(polarity_score(res[i]))
-# plt.hist(show)
-# plt.show()
+show = []
+for i in range (len(res) - 1):
+  show.append(polarity_score(res[i]))
+plt.hist(show)
+plt.show()
