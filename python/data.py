@@ -10,19 +10,24 @@ from matplotlib import rc
 import pandas as pd
 
 # 윈도우 한글 폰트 설정
-font_path = "C:/Windows/Fonts/나눔고딕.ttf"
-font = font_manager.FontProperties(fname=font_path).get_name()
-rc('font', family=font)
+# font_path = "C:/Windows/Fonts/나눔고딕.ttf"
+# font = font_manager.FontProperties(fname=font_path).get_name()
+# rc('font', family=font)
 
 # 맥 폰트 설정
-# rc('font', family='AppleGothic')
-# plt.rcParams['axes.unicode_minus'] = False
+rc('font', family='AppleGothic')
+plt.rcParams['axes.unicode_minus'] = False
 
 okt = Okt()
 # 모든 게시물 불러오기
-sql = "select * from article whrere content limit 0, 10000"
+# sql = "select * from article whrere content limit 0, 10000"
 # 상위 5개단어가 포함된 게시물 불러오기
 # sql = "select content from article where content like '%사람%' or content like '%교수%' or content like '%줌%' or content like '%수업%' or content like '%학교%' limit 0, 10000;"
+# sql = "select content from article where content like '%사람%' limit 0, 10000;"
+# sql = "select content from article where content like '%교수%' limit 0, 10000;"
+sql = "select content from article where content like '%수업%' limit 0, 10000;"
+# sql = "select content from article where content like '%줌%' limit 0, 10000;"
+# sql = "select content from article where content like '%학교%' limit 0, 10000;"
 
 
 sql_config.execute(sql)
