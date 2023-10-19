@@ -10,8 +10,8 @@ const options = {
   }
 }
 const log_info = {
-  'id' : "che0618",
-  'pw' : "hongsuck36"
+  'id' : "",
+  'pw' : ""
 }
 const url = 'https://everytime.kr/login'
 const req = session.post(url, log_info)
